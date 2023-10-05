@@ -3,15 +3,17 @@
   <div class="container">
     <h4 class="row justify-content-center">Заказ</h4>
     <div class="row justify-content-center">
+      
       <select
         v-model="selectedPers"
-        @change.prevent="console.log(selectedPers);"
+        @change.prevent="enablOrNotSub"
         class="form-select"
         aria-label="Default select example"
         aria-placeholder="Select"
         style="
           width: 80%;
           margin-top: 4px;
+          border: 2px solid #212529;
         "
       >
 
@@ -24,18 +26,6 @@
         </select>
     </div>
     <div class="row justify-content-center">
-      <VueDatePicker
-        v-model="date"
-        :enable-time-picker="false"
-        :min-date="Date.now()"
-        :start-date="startDate"
-        ignore-time-validation
-        @update:model-value="console.log(this.date)"
-        style="
-          width: 82%;
-          margin-top: 4px;
-    "
-    />
       <select
           id="selectEats"
           v-model="selectedEat" 
@@ -46,6 +36,7 @@
           style="
             width: 80%;
             margin-top: 4px;
+            border:2px solid #212529;
           "
         >
             <option 
@@ -57,22 +48,47 @@
             </option>
           </select>
       <div
-      v-for="eat in basket"
-      :key="eat.id"
+        v-for="eat in basket"
+        :key="eat.id"
       >
         <eat-item :eat-item="eat" @deleteFromBasket="deleteFromBasket"/>
       </div>
-      <button
-          class="btn"
-          style="margin-top: 4px"
+      <div
+          class="row justify-content-end"
+          style="width: 80%"
       >
-        Заказать</button>
+      <VueDatePicker
+                v-model="date"
+                :enable-time-picker="false"
+                :min-date="Date.now()"
+                :start-date="startDate"
+                ignore-time-validation
+                @update:model-value="enablOrNotSub"
+                style="
+                  margin-top: 4px;
+                  width: 150px;
+                "
+            />
+        <button
+            disabled
+            id="sub"
+            class="btn"
+            style="
+              margin-top: 4px;
+              width:130px;
+              border: 2px solid #212529;
+            "
+            @click.prevent="submitOrder"
+        >
+          Заказать
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import EatItem from "@/components/eatItem.vue";
+import EatItem from "@/components/EatItem.vue";
 
 export default {
   components: {EatItem},
@@ -85,6 +101,7 @@ export default {
       selectedPers: '',
       persons:[
         {
+          id:0,
           name:"Выберите сотрудника"
         },
         {
@@ -117,15 +134,15 @@ export default {
         }
       ],
       basket:[
-        {
-          id:this.keyForBasketCom(),
-          eat: {
-            id:0,
-            text:"hio",
-            components: "Chicken",
-            price: 12000
-          }
-        },
+        // {
+        //   id:this.keyForBasketCom(),
+        //   eat: {
+        //     id:0,
+        //     text:"hio",
+        //     components: "Chicken",
+        //     price: 12000
+        //   }
+        // },
       ]
     }
   },
@@ -142,15 +159,36 @@ export default {
       }
       console.log(curr_eat)
       this.basket = [curr_eat, ...this.basket]
+      // enable or disable button
+      this.enablOrNotSub()
+      //
       console.log(this.basket)
       this.selectedEat=this.eats[0]
     },
     deleteFromBasket(eatItem){
       this.basket = this.basket.filter(eat => eat !== eatItem)
+      this.enablOrNotSub()
     },
     keyForBasketCom() {
       this.keyForBasket += 1
       return this.keyForBasket
+    },
+    submitOrder(){
+      // приводим страничку к первоначальному виду
+      this.selectedPers = this.persons[0].name
+      this.selectedEat = this.eats[0]
+      this.basket = []
+      this.date = null
+      document.getElementById('sub').disabled = true
+    },
+    enablOrNotSub(){
+      var butSub=document.getElementById('sub')
+      if(this.selectedPers !== this.persons[0].name && this.date!==null && this.basket.length>0){
+        butSub.disabled = false
+      } else {
+        butSub.disabled = true
+        document.getElementById('sub').disabled = true
+      }
     },
   },
   mounted() {

@@ -12,7 +12,7 @@
               <router-link class="nav-link" aria-current="page" to="/">Home</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" aria-current="page" to="/dcd">History</router-link>
+              <router-link class="nav-link" aria-current="page" to="history">History</router-link>
             </li>
           </ul>
         </div>
