@@ -1,5 +1,4 @@
 <template>
-  
   <div class="container">
     <h4 class="row justify-content-center">Заказ</h4>
     <div class="row justify-content-center">
@@ -94,11 +93,17 @@ export default {
   components: {EatItem},
   data(){
     return {
+      // поле для настройки валидации выбора даты
       startDate: Date.now()+1,
+      // здесь будет лежать выбраная дата
       date:null,
+      // переменная для метода keyForBasketCom
       keyForBasket:0,
+      // модель для выбора Блюда
       selectedEat:'',
+      // модель для выбора Сотрудника
       selectedPers: '',
+      // Массив сотрудников, которые будут помещены в select
       persons:[
         {
           id:0,
@@ -113,6 +118,7 @@ export default {
           name:"Nina"
         }
       ],
+      // Массив блюд, которые будут помещены в select
       eats: [
         {
           id:0,
@@ -130,9 +136,10 @@ export default {
           id:2,
           text:"hio2",
           components: "Chicken",
-          price: 12000
+          price: 1200
         }
       ],
+      // корзина
       basket:[
         // {
         //   id:this.keyForBasketCom(),
@@ -148,27 +155,29 @@ export default {
   },
   methods: {
     addToBasket(){
-      console.log(1)
+      // если в корзине больше 10 блюд - вы не сможете добавить еще чтото
       if(this.basket.length > 10){
         this.selectedEat=this.eats[0]
         return
       }
+      // генерация объекта блюда
       var curr_eat = {
         id: this.keyForBasketCom(),
         eat: this.eats.find(obj=>obj === this.selectedEat)
       }
-      console.log(curr_eat)
+      // добавление в локальную корзину
       this.basket = [curr_eat, ...this.basket]
-      // enable or disable button
+      // запуск метода, включающего или выключающего кнопку
       this.enablOrNotSub()
-      //
-      console.log(this.basket)
+      // возвращение select к изначальному виду 
       this.selectedEat=this.eats[0]
     },
     deleteFromBasket(eatItem){
       this.basket = this.basket.filter(eat => eat !== eatItem)
+      // запуск метода, включающего или выключающего кнопку
       this.enablOrNotSub()
     },
+    // метод для генерации :key для v-for
     keyForBasketCom() {
       this.keyForBasket += 1
       return this.keyForBasket
@@ -181,17 +190,20 @@ export default {
       this.date = null
       document.getElementById('sub').disabled = true
     },
+    // метод включающий или выключающий кнопку
     enablOrNotSub(){
+      // кнопка отправки заказа на сервер
       var butSub=document.getElementById('sub')
+      // проверка на валидность заказа, и если не валиден - конпка не нажмется
       if(this.selectedPers !== this.persons[0].name && this.date!==null && this.basket.length>0){
         butSub.disabled = false
       } else {
         butSub.disabled = true
-        document.getElementById('sub').disabled = true
       }
     },
   },
   mounted() {
+    // помещение начальных значений  в select-ы
     this.selectedPers = this.persons[0].name
     this.selectedEat = this.eats[0]
   }
