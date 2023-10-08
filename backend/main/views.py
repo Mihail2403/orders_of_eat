@@ -39,6 +39,17 @@ class OrderAPIView(APIView):
 class HistoryOfOrdersAPIView(APIView):
     def get(self, request):
         try:
+            orders = []
+            for order in Order.objects.all():
+                eatList = []
+                eatObjectsList = []
+                for eatOfOrder in EatOfOrder.objects.filter(order=order):
+                    if eatOfOrder not in eatList:
+                        eatObjectsList.append({"eat":eatOfOrder, "count":1})
+                        eatList.append(eatOfOrder)
+                    else:
+                        pass
+
             return response.Response({"status":"good"})
         except Exception as e:
             print(e)
