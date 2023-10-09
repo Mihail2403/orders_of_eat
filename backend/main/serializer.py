@@ -14,4 +14,3 @@ class EatItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = EatItem
         fields = '__all__'
-

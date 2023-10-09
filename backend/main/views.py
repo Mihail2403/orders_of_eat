@@ -5,8 +5,54 @@ from rest_framework import response
 from rest_framework.views import APIView
 from rest_framework import generics
 
+from .pagination import OrderListPagination
+
 from .serializer import EatItemSerializer, WorkerSerializer
 from .models import EatItem, EatOfOrder, Order, Worker
+
+# Служебная функция для генерации списка заказов
+def orderQuerysetGenerator():
+        try:
+            orders = []
+            for order in Order.objects.all():
+                eatList = []
+                eatObjectsList = []
+                for eatOfOrder in EatOfOrder.objects.filter(order=order):
+                    if not next(filter(lambda obj: obj.eatItem==eatOfOrder.eatItem, eatList), None):
+                        print(eatOfOrder.eatItem)
+                        print(eatList[0].eatItem if len(eatList)>0 else None)
+                        eatObjectsList.append(
+                            # объект eatItem, подходящий для сериализации
+                                {
+                                    "id": eatOfOrder.id, 
+                                    "eat": {
+                                        "id":eatOfOrder.eatItem.id,
+                                        "text":eatOfOrder.eatItem.name,
+                                        "components":eatOfOrder.eatItem.components,
+                                        "price":eatOfOrder.eatItem.price
+                                    },
+                                    "count": 1
+                                    }
+                            )
+                        eatList.append(eatOfOrder)
+                    else:
+                        next(
+                                filter(lambda obj: obj["eat"]["id"] == eatOfOrder.eatItem.id, eatObjectsList),
+                                None
+                            )["count"]+=1
+                order_object = {
+                    "id": order.id,
+                    "date": order.date.toordinal(),
+                    "person":order.worker.id,
+                    "Eats": eatObjectsList
+                }
+                orders.append(order_object)
+            return orders
+        except Exception as e:
+            print(e)
+            return None
+
+
 
 # список сотрудников
 class WorkerListAPIView(generics.ListAPIView):
@@ -35,7 +81,8 @@ class OrderAPIView(APIView):
             print(e)
             return response.Response({"status": "bad"})
 
-# история заказов 
+
+# история заказов
 class HistoryOfOrdersAPIView(APIView):
     def get(self, request):
         try:
@@ -44,13 +91,37 @@ class HistoryOfOrdersAPIView(APIView):
                 eatList = []
                 eatObjectsList = []
                 for eatOfOrder in EatOfOrder.objects.filter(order=order):
-                    if eatOfOrder not in eatList:
-                        eatObjectsList.append({"eat":eatOfOrder, "count":1})
+                    if not next(filter(lambda obj: obj.eatItem==eatOfOrder.eatItem, eatList), None):
+                        print(eatOfOrder.eatItem)
+                        print(eatList[0].eatItem if len(eatList)>0 else None)
+                        eatObjectsList.append(
+                            # объект eatItem, подходящий для сериализации
+                                {
+                                    "id": eatOfOrder.id, 
+                                    "eat": {
+                                        "id":eatOfOrder.eatItem.id,
+                                        "text":eatOfOrder.eatItem.name,
+                                        "components":eatOfOrder.eatItem.components,
+                                        "price":eatOfOrder.eatItem.price
+                                    },
+                                    "count": 1
+                                    }
+                            )
                         eatList.append(eatOfOrder)
                     else:
-                        pass
-
-            return response.Response({"status":"good"})
+                        next(
+                                filter(lambda obj: obj["eat"]["id"] == eatOfOrder.eatItem.id, eatObjectsList),
+                                None
+                            )["count"]+=1
+                order_object = {
+                    "id": order.id,
+                    "date": order.date.toordinal(),
+                    "person":order.worker.id,
+                    "Eats": eatObjectsList
+                }
+                orders.append(order_object)
+            return response.Response({"status":"good", "order_list":orders})
         except Exception as e:
             print(e)
             return response.Response({"status":"bad"})
+        
