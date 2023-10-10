@@ -78,7 +78,7 @@ export default {
         for(let i = 0; i<eats.length; i++){
             this.fullPrice += eats[i].eat.price*eats[i].count
         }
-        var dateLocal = new Date(this.order.date)
+        var dateLocal = new Date(this.order.date*86400000)
         console.log(dateLocal)
         this.dateOrder = `${dateLocal.getDate()} ${this.month[dateLocal.getMonth()]} ${dateLocal.getFullYear()} года`
     }

@@ -1,85 +1,38 @@
 <template>
-    <div 
-        class="container">
-        <div class="row" v-for="order in listOfOrders" :key="order.id">
-            <history-item :order="order"/>
+    <div v-if="listOfOrders.length>0">
+        <div 
+            class="container">
+            <div class="row" v-for="order in listOfOrders" :key="order.id">
+                <history-item :order="order"/>
+            </div>
         </div>
+    </div>
+    <div v-else>
+        <message-item :message="{title:'Нет заказов'}"/>
     </div>
 </template>
   
 <script>
+import axios from 'axios'
 import HistoryItem from '@/components/HistoryItem.vue'
-
+import MessageItem from '@/components/MessageItem.vue'
 export default {
-    components:{HistoryItem},
+    components:{HistoryItem, MessageItem},
     data() {
         return {
-            listOfOrders: [
-                {
-                    id: 0,
-                    date: Date.now(),
-                    person: {
-                        id: 1,
-                        name: "Mic"
-                    },
-                    Eats: [
-                        {
-                            id: 0,
-                            count: 2,
-                            eat: {
-                                id: 0,
-                                text: "hio",
-                                components: "Chicken",
-                                price: 12000
-                            }
-                        },
-                        {
-                            id: 1,
-                            count:1,
-                            eat: {
-                                id: 1,
-                                text: "hio1",
-                                components: "Chicken",
-                                price: 11000
-                            }
-                        }
-                    ],
-                },
-                {
-                    id: 1,
-                    date: Date.now(),
-                    person: {
-                        id: 2,
-                        name: "Nina"
-                    },
-                    Eats: [
-                        {
-                            id: 0,
-                            count: 1,
-                            eat: {
-                                id: 0,
-                                text: "hio",
-                                components: "Chicken",
-                                price: 12000
-                            }
-                        },
-                        {
-                            id: 1,
-                            count:5,
-                            eat: {
-                                id: 1,
-                                text: "hio1",
-                                components: "Chicken",
-                                price: 11000
-                            }
-                        }
-                    ]
-                }
-            ]
+            listOfOrders: []
         };
     },
     mounted() {
+        axios.get(
+            'http://localhost:8000/api/v1/history/'
+        ).then(
+            response => {
+                this.listOfOrders = response.data['order_list']
+            }
+        )
         
+        console.log(this.listOfOrders)
     },
 }
 </script>

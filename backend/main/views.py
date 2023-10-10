@@ -68,12 +68,13 @@ class EatItemListAPIView(generics.ListAPIView):
 class OrderAPIView(APIView):
     def post(self, request):
         try:
+            print(request.data['date'])
             dateOrder = date.fromordinal(request.data["date"])
             worker = Worker.objects.get(id=request.data["worker_id"])
             order = Order.objects.create(date=dateOrder, worker=worker)
             for eat in request.data["eats"]:
                 EatOfOrder.objects.create(
-                    eatItem=EatItem(id=eat["id"]),
+                    eatItem=EatItem(id=eat['eat']['id']),
                     order=order
                     )
             return response.Response({"status":"good","order":order.id})
@@ -92,8 +93,6 @@ class HistoryOfOrdersAPIView(APIView):
                 eatObjectsList = []
                 for eatOfOrder in EatOfOrder.objects.filter(order=order):
                     if not next(filter(lambda obj: obj.eatItem==eatOfOrder.eatItem, eatList), None):
-                        print(eatOfOrder.eatItem)
-                        print(eatList[0].eatItem if len(eatList)>0 else None)
                         eatObjectsList.append(
                             # объект eatItem, подходящий для сериализации
                                 {
@@ -116,7 +115,10 @@ class HistoryOfOrdersAPIView(APIView):
                 order_object = {
                     "id": order.id,
                     "date": order.date.toordinal(),
-                    "person":order.worker.id,
+                    "person":{
+                        "id":order.worker.id, 
+                        "name":order.worker.name
+                        },
                     "Eats": eatObjectsList
                 }
                 orders.append(order_object)

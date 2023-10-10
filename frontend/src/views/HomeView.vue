@@ -15,7 +15,6 @@
           border: 2px solid #212529;
         "
       >
-
           <option
             v-for="person in persons"
             :key="persons.indexOf(person)"
@@ -43,7 +42,7 @@
               :value="eatItem"
               :key="eats.indexOf(eatItem)"
             >
-              {{eatItem.text}}
+              {{eatItem.name}}
             </option>
           </select>
       <div
@@ -87,6 +86,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 import EatItem from "@/components/EatItem.vue";
 
 export default {
@@ -109,35 +109,15 @@ export default {
           id:0,
           name:"Выберите сотрудника"
         },
-        {
-          id:1,
-          name:"Mic"
-        },
-        {
-          id:2,
-          name:"Nina"
-        }
       ],
       // Массив блюд, которые будут помещены в select
       eats: [
         {
           id:0,
-          text:"Выберите блюдо",
+          name:"Выберите блюдо",
           components: "",
           price: 0
         },
-        {
-          id:1,
-          text:"hio1",
-          components: "Chicken",
-          price: 1000
-        },
-        {
-          id:2,
-          text:"hio2",
-          components: "Chicken",
-          price: 1200
-        }
       ],
       // корзина
       basket:[
@@ -183,6 +163,16 @@ export default {
       return this.keyForBasket
     },
     submitOrder(){
+      console.log(Math.floor(+this.date / 86400000))
+      axios.post(
+        'http://localhost:8000/api/v1/order/',
+        {
+            "date": Math.floor(+this.date / 86400000),
+            "worker_id":this.persons.find(obj=>obj.name === this.selectedPers).id,
+            "eats": this.basket
+        }
+      ).then(response => console.log(response)) 
+
       // приводим страничку к первоначальному виду
       this.selectedPers = this.persons[0].name
       this.selectedEat = this.eats[0]
@@ -204,10 +194,28 @@ export default {
   },
   mounted() {
     // помещение начальных значений  в select-ы
-    this.selectedPers = this.persons[0].name
     this.selectedEat = this.eats[0]
-  }
-}
+    this.selectedPers = this.persons[0].name
+    // инициализация списков сотрудников и блюд для select-ов данными с сервера
+    axios.get(
+      'http://localhost:8000/api/v1/worker-list/'
+      ).then(
+        response => {
+          this.persons = [this.persons[0], ...response.data]
+        }).catch(
+          err => console.log(err)
+        )
+    axios.get(
+      'http://localhost:8000/api/v1/eat-list/'
+      ).then(
+        response => {
+          console.log(response)
+          this.eats = [this.eats[0], ...response.data]
+        }).catch(
+          err => console.log(err)
+        )
+      }
+    }
 </script>
 
 <style>

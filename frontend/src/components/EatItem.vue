@@ -8,7 +8,7 @@
                     margin-top: 2px;
                     ">
       <div class="col-10">
-        {{this.eatItem.eat.text}} - {{this.eatItem.eat.price}} руб.
+        {{this.eatItem.eat.name}} - {{this.eatItem.eat.price}} руб.
       </div>
       <div class="col-2">
         <button 
