@@ -16,7 +16,7 @@ class EatItem(models.Model):
     price = models.IntegerField()
 
     def __str__(self) -> str:
-        return f"{self.name}({self.components}) - {self.price} руб."
+        return f"{self.name} - {self.price} руб."
 
 # заказ
 class Order(models.Model):
@@ -24,7 +24,7 @@ class Order(models.Model):
     worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
     
     def __str__(self) -> str:
-        return f"{self.worker} на {self.date} c id={self.id}"
+        return f"{self.worker} c id={self.id}"
 
 # блюдо заказа
 class EatOfOrder(models.Model):

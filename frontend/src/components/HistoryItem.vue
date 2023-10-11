@@ -49,8 +49,11 @@
 export default {
     data(){
         return {
+            // Итоговая цена(цена всех заказаных блюд)
             fullPrice:0,
-            dateOrder:0,
+            // Сторока, означающая дату, указаную при заказе
+            dateOrder:"",
+            // Месяца для составления dateOrder
             month:[
                 "января", 
                 "февраля", 
@@ -74,12 +77,14 @@ export default {
         }
     },
     mounted(){
+        // Вычисление итоговой цены
         var eats = this.order.Eats
         for(let i = 0; i<eats.length; i++){
             this.fullPrice += eats[i].eat.price*eats[i].count
         }
+        // Преобразование полученного с бэкенда числа в объект Date
         var dateLocal = new Date(this.order.date*86400000)
-        console.log(dateLocal)
+        // Сериализация Из объекта Data в строку, для удобного отображения
         this.dateOrder = `${dateLocal.getDate()} ${this.month[dateLocal.getMonth()]} ${dateLocal.getFullYear()} года`
     }
 }
