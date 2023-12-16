@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from main import urls as mainUrls
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     # панель администратра
@@ -24,4 +26,4 @@ urlpatterns = [
     
     # основной паттерн url адреса api
     path('api/v1/', include(mainUrls.urlpatterns))
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

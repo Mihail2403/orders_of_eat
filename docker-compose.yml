@@ -1,18 +1,16 @@
 version: '3'
 
-services:
-  pgdb:
-    image: postgres:16
-    expose:
-      - '5432'
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    restart: always
-    volumes:
-      - pgdbdata:/var/lib/postgresql/data/
+networks:
+  net:
+    name: orders_net
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.90.0/24
+          gateway: 192.168.90.1
 
+services:
   backend:
     container_name: backend
     build: ./backend
@@ -29,7 +27,43 @@ services:
       - "8000:8000"
     depends_on:
       - pgdb
+    networks:
+      net:
+        ipv4_address: 192.168.90.102
   
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    command: sh -c "
+      npm install @vue/cli-plugin-eslint
+      && npm run build
+      && http-server dist -p 80"
+    volumes:
+      - ./frontend:/frontend
+    ports:
+      - 80:80
+    networks:
+      net:
+        ipv4_address: 192.168.90.103
+    depends_on:
+      - backend
+      - pgdb
+  
+  pgdb:
+    image: postgres:16
+    expose:
+      - '5432'
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    restart: always
+    volumes:
+      - pgdbdata:/var/lib/postgresql/data/
+    networks:
+      net:
+        ipv4_address: 192.168.90.104
+
 volumes:
   django-static:
   pgdbdata:

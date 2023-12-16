@@ -63,7 +63,7 @@ export default {
     mounted() {
         // Получение истории заказов с бэкенда
         axios.get(
-            'http://localhost:8000/api/v1/history/'
+            'http://192.168.90.2:8000/api/v1/history/'
         ).then(
             response => {
                 this.listOfOrders = response.data['order_list']

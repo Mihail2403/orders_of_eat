@@ -191,7 +191,7 @@ export default {
     submitOrder(){
       // Отправка заказа на бэкенд
       axios.post(
-        'http://localhost:8000/api/v1/order/',
+        'http://192.168.90.2:8000/api/v1/order/',
         {
             "date": Math.floor(+this.date / 86400000),
             "worker_id":this.persons.find(obj=>obj.name === this.selectedPers).id,
@@ -237,7 +237,7 @@ export default {
     this.selectedPers = this.persons[0].name
     // инициализация списков сотрудников и блюд для select-ов данными с сервера
     axios.get(
-      'http://localhost:8000/api/v1/worker-list/'
+      'http://192.168.90.2:8000/api/v1/worker-list/'
       ).then(
         response => {
           this.persons = [this.persons[0], ...response.data]
@@ -245,7 +245,7 @@ export default {
           err => console.log(err)
         )
     axios.get(
-      'http://localhost:8000/api/v1/eat-list/'
+      'http://192.168.90.2:8000/api/v1/eat-list/'
       ).then(
         response => {
           console.log(response)
